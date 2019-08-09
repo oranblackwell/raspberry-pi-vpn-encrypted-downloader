@@ -205,8 +205,12 @@ echo "$IP_OF_NET_DRIVE$MEDIA_DIR_ON_NET_DRIVE $ABS_DIR_ON_RPI cifs defaults,rw,u
 ```
 
 For reference, here are two examples of a full line that's appended to /etc/fstab:
+```
 //192.168.1.101/Media /mnt/net cifs defaults,rw,uid=1000,gid=1000,username=pi,password=XXXXXXXXXXX,x-systemd.automount 0 0
+```
+```
 //192.168.1.101/Media /home/pi/wdMyCloud cifs defaults,rw,uid=1000,gid=1000,username=pi,password=XXXXXXXXXXX,x-systemd.automount 0 0
+```
 
 You should now be able to `cd` into your network directory from the RPi-Box and view any pre-existing media. I strongly recommend your run 'sudo reboot' and double check the drive is still mounted afterwards. If its not you will definelty run into dificulties later on.
 
@@ -235,16 +239,15 @@ Dont forget to reboot and double check that both these mount points are auto-mou
 
 
 
-
+```
 # ########################################################################### #
 # =========================================================================== #
+```
 
-## Installing OpenVPN
-
-
-
+```
 # ########################################################################### #
 # =========================================================================== #
+```
 
 ```
 echo -e "\e[1;35m
