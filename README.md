@@ -30,8 +30,6 @@ The following guide will take you through all the steps needed to  take a fresh 
  
 #### Note on the Operating System
  - A ***headless*** Operating System mean that there is no GUI - Graphical User Interface - meaning that you are **only** able to interact via the command line and SSH. This results in a more light-weight system, ie. better overall system performance but at the cost of graphical and interaction features.
-
-
 	  
 ### Individual Steps
 
@@ -58,9 +56,6 @@ The following guide will take you through all the steps needed to  take a fresh 
 | Mounted via 									| 			| [Etcher](https://etcher.io/) (for Windows 10 x64)      |
 | Network HDD 									| 			| 3TB WDMyCloud Home      |
 | Second HDD (USB)								| 			| XXXXXXX      |
-
-
-
 
 
 ## Getting Started
@@ -121,8 +116,7 @@ Select "y" if prompted to allow changes.
 
 Once everything is finished reboot your deivce via: `sudo reboot now`
 
-## Setting up the network attached storage
-
+# Setting up the hardrives
 You can check if your drive is available  for mounting via:
 `sudo blkid` or `lsblk`
 
@@ -134,11 +128,16 @@ or
 
 For the filesystem on my 3TB WD My Cloud I needed to run `sudo apt-get install ntfs-3g`
 
-Once the utilities are installed you will need to create an emtpy directory to which you will mount the drive. The convention is to mount these within your /mnt directory.  
-I chose to name my mount "net" located here: /mnt/net 
+Once the utilities are installed you will need to create an emtpy directory to which you will mount the drive. The convention is to mount these within your /mnt directory.
+
+I choose to name my network mount "net" located here: /mnt/net 
 Another approach is to mount it within your User's home direcory, ie. /usr/pi for our default installation. This is often shortened to "~" (pronounced tilde). So you can cd to your user's home directory by typing  ```cd /usr/pi``` and/or ```cd ~```
 
-I created it via:
+## Setting up the network attached storage
+
+After installing the appropriate drivers (above)
+
+I created my mount point via:
 ```
 sudo mkdir /mnt/net
 ```
@@ -156,8 +155,13 @@ When you have worked out all the variables, the entire process can by simplified
 ``` 
 echo "//192.168.1.101/Media /mnt/net cifs defaults,rw,uid=pi,gid=pi,username=pi,password=XXXXXXXXXX,x-systemd.automount 0 0" | sudo tee -a /etc/fstab > /dev/null
 ```
+
 What this does is echo (or print) the text inside the inverted commas into the file /etc/fstab. This file is read each time your system boots.
 
+##### Please Note
+Running this command multiple lines will add multiple lines to your /etc/fstab which may cause issues. You can maually edit this file and remove any previously entered lines.
+
+#### Variables
 ```
 ABS_DIR_ON_RPI="/mnt/net" 
   # Absolute path to mounted directory.
@@ -188,7 +192,6 @@ NET_DRIVE_PASSWORD="<mypassword>"
   #+ Write Access required in order to create thumbnails & previews, add subtitles, posters etc. 
   #+ and also delete episodes after watching via setting in Plex.
 
-
 sudo mount -t cifs -o guest ${IP_OF_NET_DRIVE}${MEDIA_DIR_ON_NET_DRIVE} ${ABS_DIR_ON_RPI}
   # This mounts the drive on THIS boot
   #+ NOTE: You may need to change cifs to your relevant drive, eg nfs etc.
@@ -206,6 +209,38 @@ For reference, here are two examples of a full line that's appended to /etc/fsta
 //192.168.1.101/Media /home/pi/wdMyCloud cifs defaults,rw,uid=1000,gid=1000,username=pi,password=XXXXXXXXXXX,x-systemd.automount 0 0
 
 You should now be able to `cd` into your network directory from the RPi-Box and view any pre-existing media. I strongly recommend your run 'sudo reboot' and double check the drive is still mounted afterwards. If its not you will definelty run into dificulties later on.
+
+After rebooting type `cd /mnt/net` and hopefully you'll be in your network-attached hard-drive's location.
+
+
+## Mounting a USB HDD (for temporary downloading and processing)
+
+This is very much the same as the netowrd attached HDD aboce with only a few differences.
+
+Instead of using an IP address you will use the ID assign to the dirve which you can find by running `lsblk`. It should be something along the lines of sda1 or sda2.
+
+You then create the appropriate mount point, grant the correct permissions and add the correct line to your /etc/dfstab.
+
+```
+sudo mkdir /mnt/usb
+sudo chown -R $USER /mnt/usb
+sudo chmod -R 775 /mnt/usb
+
+echo "/dev/sda1 /mnt/usb ntfs-3g defaults,rw,ofail,x-systemd.device-timeout=1  0 0" | sudo tee -a /etc/fstab > /dev/null
+```
+
+
+Dont forget to reboot and double check that both these mount points are auto-mounted.
+
+
+
+
+
+# ########################################################################### #
+# =========================================================================== #
+
+## Installing OpenVPN
+
 
 
 # ########################################################################### #
