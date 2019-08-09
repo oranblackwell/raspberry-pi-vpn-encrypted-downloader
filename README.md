@@ -237,12 +237,87 @@ echo "/dev/sda1 /mnt/usb ntfs-3g defaults,rw,ofail,x-systemd.device-timeout=1  0
 Dont forget to reboot and double check that both these mount points are auto-mounted.
 
 
+# Installing your VPN
+In order to secure your connection you will nned to install some sort of VPN - the most usual setup is to have a subscription to a VPN provider such as Nord VPN and connect to this via OpenVPN.
 
+Again, check that your system is up-to-date via
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
 
+Then install OpenVPN via
+```
+sudo apt-get install openvpn
+
+cd /etc/openvpn
+
+sudo wget https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip
+sudo unzip ovpn.zip
+```
+Once installed you need to copy your preffered connection location and protocall from either /etc/eopenvpn/open_tcp or /etc/eopenvpn/open_udp to /etc/openvpn.
+
+``` 
+sudo mv ovpn_tcp/ie25.nordvpn.com.tcp.ovpn ie25.nordvpn.com.tcp.ovpn
+ ```
+ 
+ ```
+sudo mv ovpn_udp/ie25.nordvpn.com.udp.ovpn ie25.nordvpn.com.udp.ovpn
+```
+
+You can test that you can connect via this newly copie file via:
+
+```
+sudo openvpn --config ie25.nordvpn.com.tcp.ovpn --daemon
+```
+
+You will be prompted for your username and password for your VPN provider's account. (In my case it was my username and password for NordVPN).
+
+You can bypass the necessity to enter your credential's everytime you connect by creating file containting your credentials and referencing this each time.
+
+#x#x#x#x##x#x insert this process
 ```
 # ########################################################################### #
 # =========================================================================== #
 ```
+
+#nstall DockSTARTer
+
+
+#dealing with openvpn not behaving well with docker
+
+"After installing a vpn, and it turns out that enabled openvpn breaks docker.
+
+When I try to run docker-compose up i get following error:
+
+ERROR: could not find an available, non-overlapping IPv4 address pool among the defaults to assign to the network
+
+
+
+Solution (TL;DR;)
+Create /etc/openvpn/fix-routes.sh script with following contents:
+
+#!/bin/sh
+
+echo "Adding default route to $route_vpn_gateway with /0 mask..."
+ip route add default via $route_vpn_gateway
+
+echo "Removing /1 routes..."
+ip route del 0.0.0.0/1 via $route_vpn_gateway
+ip route del 128.0.0.0/1 via $route_vpn_gateway
+Add executable bit to the file: chmod o+x /etc/openvpn/fix-routes.sh. Change owner of this file to root: chown root:root  /etc/openvpn/fix-routes.sh.
+
+Add to your config following two lines:
+
+ script-security 2
+ route-up  /etc/openvpn/fix-routes.sh
+Explanation
+Openvpn adds routes that for following networks: 0.0.0.0/1 and 128.0.0.0/1 (these routes cover entire IP range), and docker can't find range of IP addresses to create it's own private network.
+
+You need to add a default route (to route everything through openvpn) and disable these two specific routes. fix-routes script does that.
+
+This script is called after openvpn adds its own routes. To execute scripts you'll need to set script-security to 2 which allows execution of bash scripts from openvpn context.
+
 
 ```
 # ########################################################################### #
@@ -274,3 +349,4 @@ Give system some time to start services before trying to access above via browse
 *I used a great [post by GreenFrog](http://greenfrog.eu5.net/rpilds.php) as a starting point for this article.*
 
 (Ctrl+Shift+M -  Open Notepad++ Markdown Split-screen Plugin)
+u
