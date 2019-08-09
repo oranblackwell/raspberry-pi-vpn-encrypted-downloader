@@ -1,0 +1,2 @@
+# raspberry-pi-vpn-encrypted-downloader
+The following guide will take you through all the steps needed to take a fresh raspberry pi and setup all the tools required to have a VPN-encrypted download box running Docker Compose instances of Sonarr and Radarr (for Tv and Movies respectively), supporting downloads via torrents and usenet (setup via by DockStarter), topped off with real-time monitoring via RPi Monitor, also running as a Docker Compose instance.
